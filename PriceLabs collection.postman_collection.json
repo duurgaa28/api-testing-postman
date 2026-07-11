@@ -1,0 +1,274 @@
+{
+  "info": {
+    "_postman_id": "82182df7-fa0b-4162-8696-70acc4816a2e",
+    "name": "PriceLabs collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32857908"
+  },
+  "item": [
+    {
+      "name": "Fetch All Listings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Listings array exists\", function () {\r",
+              "    pm.expect(response.listings).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Listings are returned\", function () {\r",
+              "    pm.expect(response.listings.length).to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.environment.set(\"listingId\", response.listings[0].id);\r",
+              "pm.environment.set(\"pmsName\", response.listings[0].pms);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": " {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/listings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Rates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is an array\", function () {\r",
+              "    pm.expect(response).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"At least one listing is returned\", function () {\r",
+              "    pm.expect(response.length).to.be.above(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Listing ID is returned\", function () {\r",
+              "    pm.expect(response[0]).to.have.property(\"id\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"PMS is returned\", function () {\r",
+              "    pm.expect(response[0]).to.have.property(\"pms\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Currency is returned\", function () {\r",
+              "    pm.expect(response[0]).to.have.property(\"currency\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Pricing data exists\", function () {\r",
+              "    pm.expect(response[0]).to.have.property(\"data\");\r",
+              "    pm.expect(response[0].data).to.be.an(\"array\");\r",
+              "    pm.expect(response[0].data.length).to.be.above(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"First pricing record contains required fields\", function () {\r",
+              "    pm.expect(response[0].data[0]).to.have.property(\"date\");\r",
+              "    pm.expect(response[0].data[0]).to.have.property(\"price\");\r",
+              "    pm.expect(response[0].data[0]).to.have.property(\"min_stay\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Price is numeric\", function () {\r",
+              "    pm.expect(response[0].data[0].price).to.be.a(\"number\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Minimum stay is numeric\", function () {\r",
+              "    pm.expect(response[0].data[0].min_stay).to.be.a(\"number\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": " {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"listings\": [\r\n    {\r\n      \"id\": \"494081\",\r\n      \"pms\": \"hostaway\"\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/listing_prices",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listing_prices"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Date Level Override",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Override added successfully\", function () {\r",
+              "    pm.expect(response.overrides).to.be.an(\"array\");\r",
+              "    pm.expect(response.overrides.length).to.be.above(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Override date matches\", function () {\r",
+              "    pm.expect(response.overrides[0].date).to.eql(\"2026-07-15\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Override price matches\", function () {\r",
+              "    pm.expect(response.overrides[0].price).to.eql(\"5000\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"overrides\": [\r\n        {\r\n            \"date\": \"2026-07-15\",\r\n            \"price\": \"5000\",\r\n            \"price_type\": \"fixed\",\r\n            \"currency\": \"INR\",\r\n            \"min_stay\": 2,\r\n            \"reason\": \"TEST D\"\r\n        }\r\n    ],\r\n    \"pms\": \"{{pmsName}}\",\r\n    \"update_children\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/listings/{{listingId}}/overrides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings",
+            "{{listingId}}",
+            "overrides"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Date Level Override",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {\r",
+              "    pm.response.to.have.status(204);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response body is empty\", function () {\r",
+              "    pm.expect(pm.response.text()).to.eql(\"\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"overrides\": [\r\n        {\r\n            \"date\": \"2026-07-15\"\r\n        }\r\n    ],\r\n    \"pms\": \"{{pmsName}}\",\r\n    \"update_children\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/listings/{{listingId}}/overrides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings",
+            "{{listingId}}",
+            "overrides"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
